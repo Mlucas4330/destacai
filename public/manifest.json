@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "DestacaAI",
+  "version": "0.1.0",
+  "description": "Automate your LinkedIn outreach with AI-generated personalized messages",
+  "permissions": ["storage", "contextMenus"],
+  "host_permissions": [
+    "https://api.openai.com/*",
+    "https://generativelanguage.googleapis.com/*",
+    "https://api.anthropic.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "index.html",
+    "default_title": "DestacaAI"
+  }
+}
