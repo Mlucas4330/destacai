@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CV – Full Name</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Times New Roman", Times, serif;
+            font-size: 10pt;
+            color: #000;
+            background: #fff;
+            padding: 1.5cm;
+            max-width: 21cm;
+            margin: 0 auto;
+            line-height: 1.4;
+        }
+
+        /* ── Header ── */
+        .header {
+            text-align: center;
+            margin-bottom: 0.6em;
+        }
+
+        .header h1 {
+            font-size: 18pt;
+            font-weight: bold;
+            margin-bottom: 0.2em;
+        }
+
+        .header .contact {
+            font-size: 10pt;
+        }
+
+        .header .contact a {
+            color: #000;
+            text-decoration: none;
+        }
+
+        .header .contact .sep {
+            margin: 0 0.3em;
+        }
+
+        /* ── Section ── */
+        section {
+            margin-top: 0.8em;
+        }
+
+        section h2 {
+            font-size: 13pt;
+            font-weight: bold;
+            border-bottom: 1px solid #000;
+            padding-bottom: 0.15em;
+            margin-bottom: 0.4em;
+        }
+
+        /* ── CV Entry ── */
+        .cv-entry {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.1em;
+        }
+
+        .cv-entry .left {
+            text-align: left;
+        }
+
+        .cv-entry .right {
+            text-align: right;
+            white-space: nowrap;
+            padding-left: 1em;
+        }
+
+        .cv-entry .company {
+            font-weight: bold;
+        }
+
+        .cv-entry .role {
+            font-style: italic;
+        }
+
+        .cv-entry .location {
+            font-style: italic;
+        }
+
+        /* ── Bullet list ── */
+        ul {
+            margin-top: 0.25em;
+            margin-bottom: 0.5em;
+            padding-left: 0.75em;
+            list-style-type: disc;
+        }
+
+        ul li {
+            margin-bottom: 0.2em;
+        }
+
+        /* ── Skills ── */
+        .skills ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .skills ul li {
+            margin-bottom: 0.2em;
+        }
+
+        /* ── Print styles ── */
+        @media print {
+            body {
+                padding: 0;
+            }
+
+            @page {
+                margin: 1.5cm;
+                size: A4;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <div class="header">
+        <h1>Full Name</h1>
+        <div class="contact">
+            City, State
+            <span class="sep">•</span>
+            <a href="mailto:your.email@example.com">your.email@example.com</a>
+            <span class="sep">•</span>
+            <a href="https://linkedin.com/in/username">linkedin.com/in/username</a>
+            <span class="sep">•</span>
+            <a href="https://github.com/username">github.com/username</a>
+        </div>
+    </div>
+
+    <!-- LEADERSHIP ACTIVITIES -->
+    <section>
+        <h2>Leadership Activities</h2>
+
+        <div class="cv-entry">
+            <div class="left">
+                <div class="company">Company / Organization Name</div>
+                <div class="role">Your Role / Position</div>
+            </div>
+            <div class="right">
+                <div class="location">Location (e.g., Remote or State, Country)</div>
+                <div class="date">Start Date – End Date</div>
+            </div>
+        </div>
+        <ul>
+            <li>Describe a meaningful leadership achievement with specific metrics.</li>
+            <li>Highlight how you managed teams, led initiatives, or drove outcomes.</li>
+            <li>Show impact on the organization or community you served.</li>
+        </ul>
+    </section>
+
+    <!-- EXPERIENCE -->
+    <section>
+        <h2>Experience</h2>
+
+        <div class="cv-entry">
+            <div class="left">
+                <div class="company">Company / Organization Name</div>
+                <div class="role">Role (e.g., Software Engineer, Data Analyst)</div>
+            </div>
+            <div class="right">
+                <div class="location">Location (e.g., Remote or State, Country)</div>
+                <div class="date">Start Date – End Date</div>
+            </div>
+        </div>
+        <ul>
+            <li>Achieved [specific result] through [action taken], resulting in [quantified impact].</li>
+            <li>Developed/Built/Created [what you did] using [technologies/methods], resulting in [benefit].</li>
+            <li>Collaborated with [team size/type] to [accomplish what], improving [metric] by [percentage/amount].</li>
+        </ul>
+
+        <div class="cv-entry">
+            <div class="left">
+                <div class="company">Company / Organization Name</div>
+                <div class="role">Role (e.g., Junior Developer, Research Assistant)</div>
+            </div>
+            <div class="right">
+                <div class="location">Location (e.g., Remote or State, Country)</div>
+                <div class="date">Start Date – End Date</div>
+            </div>
+        </div>
+        <ul>
+            <li>Use active verbs from the action verbs table in README.md.</li>
+            <li>Quantify your achievements whenever possible (numbers, percentages, deadlines).</li>
+            <li>Show progression and increasing responsibility across roles.</li>
+        </ul>
+
+        <div class="cv-entry">
+            <div class="left">
+                <div class="company">University / Research Institution</div>
+                <div class="role">Role (e.g., Undergraduate Researcher, Teaching Assistant)</div>
+            </div>
+            <div class="right">
+                <div class="location">Location (e.g., Remote or State, Country)</div>
+                <div class="date">Start Date – End Date</div>
+            </div>
+        </div>
+        <ul>
+            <li>Include research, academic work, or projects that demonstrate technical skills.</li>
+            <li>Highlight publications, presentations, or meaningful findings.</li>
+        </ul>
+    </section>
+
+    <!-- SKILLS -->
+    <section class="skills">
+        <h2>Skills</h2>
+        <ul>
+            <li><strong>Technical:</strong> List your programming languages, frameworks, tools, and methodologies</li>
+            <li><strong>Languages:</strong> Portuguese (Native), English (Proficiency Level), Third Language
+                (Proficiency Level)</li>
+        </ul>
+    </section>
+
+    <!-- EDUCATION -->
+    <section>
+        <h2>Education</h2>
+
+        <div class="cv-entry">
+            <div class="left">
+                <div class="company">Your University Name</div>
+                <div class="role">Your Degree Title (e.g., B.S. in Computer Science)</div>
+            </div>
+            <div class="right">
+                <div class="location">Location (e.g., Remote or State, Country)</div>
+                <div class="date">Start Date – End Date</div>
+            </div>
+        </div>
+    </section>
+
+</body>
+
+</html>

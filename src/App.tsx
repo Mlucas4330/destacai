@@ -1,6 +1,13 @@
-function App() {
+import { MemoryRouter, Route } from "react-router-dom"
+import Jobs from "@pages/Jobs"
+import Config from "@pages/Config"
+
+const App = () => {
   return (
-    <h1></h1>
+    <MemoryRouter>
+      <Route path="/" element={<Jobs />} />
+      <Route path="/config" element={<Config />} />
+    </MemoryRouter>
   )
 }
 

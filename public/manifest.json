@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "DestacaAI",
   "version": "0.1.0",
-  "description": "Automate your LinkedIn outreach with AI-generated personalized messages",
+  "description": "Generate custom CVs using AI",
   "permissions": ["storage", "contextMenus"],
   "host_permissions": [
     "https://api.openai.com/*",

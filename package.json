@@ -1,5 +1,5 @@
 {
-  "name": "linkedin-outreach-automation",
+  "name": "destacai",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -17,7 +17,8 @@
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-router-dom": "^7.13.1",
-    "tailwindcss": "^4.2.1"
+    "tailwindcss": "^4.2.1",
+    "vite-tsconfig-paths": "^6.1.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
