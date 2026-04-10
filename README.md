@@ -56,7 +56,7 @@ flowchart TD
 
     K --> H
 
-    H --> L[preview/download pdf custom cv and applies to job]
+    H --> L[download pdf custom cv and applies to job]
     L --> M([waits for application's response])
 
     style A fill:#c0392b,color:#fff
@@ -109,7 +109,7 @@ I acknowledge those, but accept the tradeoff for MVP simplicity.
 
 ### CV generation approach:
 
-The LLM returns structured JSON via Vercel AI SDK's `generateObject()`, validated against a Zod schema. Handlebars fills `template.html` with that data, and html2pdf converts the result to a downloadable PDF client-side.
+The LLM returns structured JSON via Vercel AI SDK's `generateText()`, validated against a Zod schema. Handlebars fills `template.html` with that data, and html2pdf converts the result to a downloadable PDF client-side.
 
 ### Retry logic:
 
@@ -162,10 +162,7 @@ src/
 
 ## Libraries
 
-- **html2pdf.js** - client-side PDF generation from the filled HTML CV template,
-  no backend required
-- **Handlebars** - HTML template engine used to inject structured CV data
-  into `template.html`
+- **html2pdf.js** - client-side PDF generation from the filled CV template, no backend required
 - **Vercel AI SDK** (`ai`, `@ai-sdk/openai`, `@ai-sdk/anthropic`, `@ai-sdk/google`) -
   provider abstraction for LLM calls; `generateObject()` returns structured JSON
   validated against a Zod schema; switching providers requires changing only the
@@ -182,30 +179,31 @@ src/
 
 ## Styles
 
-**Tailwind CSS v4** with `@theme` tokens for all design decisions — 
-no custom CSS files, no constant variables. All styles are colocated 
+**Tailwind CSS v4** with `@theme` tokens for all design decisions —
+no custom CSS files, no constant variables. All styles are colocated
 with components using utility classes.
 
 **Design tokens:**
+
 - Warm off-white background with dark navy text and yellow as the primary accent
 - Typography: DM Sans (UI) + DM Mono (code/keys)
 - Border radius: xl to 3xl - rounded buttons and cards throughout
 - Popup constrained to 360px width
 
-**Motion:** Framer Motion handles all transitions - button press feedback 
-with `whileTap`, page transitions with `AnimatePresence`, and list item 
+**Motion:** Framer Motion handles all transitions - button press feedback
+with `whileTap`, page transitions with `AnimatePresence`, and list item
 stagger animations on mount.
 
-**Notifications:** React Hot Toast with custom styling matching the dark 
+**Notifications:** React Hot Toast with custom styling matching the dark
 theme, positioned at the bottom center of the popup.
 
 ## Code Rules
 
-- UI components must not contain business logic. Services, LLM calls 
+- UI components must not contain business logic. Services, LLM calls
   and data transformations belong in the feature's service or custom hooks.
-- Helper functions that are used by a single component can live in the 
+- Helper functions that are used by a single component can live in the
   same file. If used by two or more, move to a shared location.
-- Config constants (providers, limits, feature flags) belong in 
+- Config constants (providers, limits, feature flags) belong in
   `@shared/constants.ts`, not inside components.
   No external style constant files.
 
