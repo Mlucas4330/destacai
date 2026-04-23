@@ -1,29 +1,9 @@
-const TEN_DAYS_MS = 10 * 24 * 60 * 60 * 1000
-
-function cleanupExpiredJobs() {
-  chrome.storage.local.get('jobs', ({ jobs = [] }) => {
-    const cutoff = Date.now() - TEN_DAYS_MS
-    const fresh = jobs.filter((j) => j.createdAt > cutoff)
-    if (fresh.length !== jobs.length) {
-      chrome.storage.local.set({ jobs: fresh })
-    }
-  })
-}
-
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: 'destacai-capture',
     title: 'Use as job description in DestacAI',
     contexts: ['selection'],
   })
-  chrome.alarms.create('cleanup', { periodInMinutes: 1440 })
-  cleanupExpiredJobs()
-})
-
-chrome.alarms.onAlarm.addListener((alarm) => {
-  if (alarm.name === 'cleanup') {
-    cleanupExpiredJobs()
-  }
 })
 
 chrome.contextMenus.onClicked.addListener((info) => {
