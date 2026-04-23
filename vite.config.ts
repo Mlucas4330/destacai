@@ -9,8 +9,5 @@ export default defineConfig({
     tsconfigPaths(),
     tailwindcss(),
     react(),
-  ],
-  define: {
-    global: 'globalThis',
-  },
+  ]
 })
