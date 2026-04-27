@@ -2,17 +2,22 @@ import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
 import EmptyState from '@features/jobs/components/EmptyState'
+import NoCvState from '@features/jobs/components/NoCvState'
 import JobList from '@features/jobs/components/JobList'
 import { useJobs, useDeleteJob, useClearJobs } from '@features/jobs/hooks/useJobs'
+import { useUser } from '@features/config/hooks/useUser'
 import { STORAGE_KEYS } from '@shared/constants'
 
 const Jobs = () => {
   const navigate = useNavigate()
   const { data: jobs = [], isLoading } = useJobs()
+  const { data: user, isLoading: isUserLoading } = useUser()
   const deleteJob = useDeleteJob()
   const clearJobs = useClearJobs()
 
   useEffect(() => {
+    if (isUserLoading || !user?.hasCv) return
+
     chrome.storage.local.get(STORAGE_KEYS.PENDING_DESCRIPTION, (result: { pendingDescription?: string }) => {
       if (result.pendingDescription) navigate('/add-job')
     })
@@ -22,14 +27,18 @@ const Jobs = () => {
     }
     chrome.storage.onChanged.addListener(listener)
     return () => chrome.storage.onChanged.removeListener(listener)
-  }, [navigate])
+  }, [navigate, user, isUserLoading])
 
-  if (isLoading) {
+  if (isLoading || isUserLoading) {
     return (
       <div className='flex items-center justify-center h-full'>
         <div className='w-5 h-5 border-2 border-accent rounded-full border-t-transparent animate-spin' />
       </div>
     )
+  }
+
+  if (!user?.hasCv) {
+    return <NoCvState />
   }
 
   return (

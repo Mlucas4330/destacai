@@ -3,10 +3,12 @@ import { useNavigate } from 'react-router-dom'
 import Input from '@shared/components/Input'
 import Button from '@shared/components/Button'
 import useAddJob from '../hooks/useAddJob'
+import { useUser } from '@features/config/hooks/useUser'
 import { STORAGE_KEYS } from '@shared/constants'
 
 const AddJob = () => {
   const navigate = useNavigate()
+  const { data: user } = useUser()
 
   const {
     title,
@@ -39,12 +41,14 @@ const AddJob = () => {
           value={title}
           onChange={updateTitle}
           placeholder='e.g. Senior Frontend Engineer'
+          autoComplete='organization-title'
         />
         <Input
           label='Company'
           value={company}
           onChange={updateCompany}
           placeholder='e.g. Acme Corp'
+          autoComplete='organization'
         />
         <div className='flex flex-col gap-1'>
           <label className='text-xs font-medium text-navy-muted'>Job Description</label>
@@ -58,6 +62,12 @@ const AddJob = () => {
         </div>
       </div>
 
+      {!user?.hasCv && (
+        <p className='text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2'>
+          You need to upload your CV in Settings before saving jobs.
+        </p>
+      )}
+
       <div className='flex gap-2'>
         <Button
           variant='secondary'
@@ -69,7 +79,7 @@ const AddJob = () => {
         >
           Cancel
         </Button>
-        <Button type='submit' onClick={saveJob} disabled={!isValid || isPending || isExtracting} className='flex-1'>
+        <Button type='submit' onClick={saveJob} disabled={!isValid || isPending || isExtracting || !user?.hasCv} className='flex-1'>
           {isPending ? 'Saving...' : isExtracting ? 'Extracting...' : 'Save Job'}
         </Button>
       </div>

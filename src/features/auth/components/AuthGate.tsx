@@ -8,7 +8,7 @@ interface AuthGateProps {
 }
 
 export default function AuthGate({ children }: AuthGateProps) {
-  const { isLoaded, isSignedIn } = useAuthContext()
+  const { isLoaded, isSignedIn, pendingVerification } = useAuthContext()
   const qc = useQueryClient()
 
   useEffect(() => {
@@ -24,6 +24,7 @@ export default function AuthGate({ children }: AuthGateProps) {
   }
 
   if (!isSignedIn) {
+    if (pendingVerification) return <Navigate to='/verify-code' replace />
     return <Navigate to='/sign-in' replace />
   }
 

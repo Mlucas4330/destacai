@@ -8,7 +8,6 @@ import IconButton from '@shared/components/IconButton'
 import toast from 'react-hot-toast'
 import { useUpdateJobStatus } from '../hooks/useJobs'
 import { useGenerationStatus } from '../hooks/useGenerateCV'
-import { useAtsScore } from '../hooks/useAtsScore'
 import { useUser } from '@features/config/hooks/useUser'
 
 const STATUS_LABELS: Record<JobStatus, string> = {
@@ -35,6 +34,9 @@ const formatDate = (iso: string): string => {
   return `${days} days ago`
 }
 
+const scoreColor = (score: number) =>
+  score >= 70 ? 'text-green-600' : score >= 40 ? 'text-amber-600' : 'text-red-600'
+
 interface JobItemProps {
   job: Job
   onDelete: (id: string) => void
@@ -43,10 +45,9 @@ interface JobItemProps {
 
 const JobItem = ({ job, onDelete, onGenerate }: JobItemProps) => {
   const [showStatusMenu, setShowStatusMenu] = useState(false)
-  const [showAts, setShowAts] = useState(false)
+  const [expandedAts, setExpandedAts] = useState<'uploaded' | 'generated' | null>(null)
   const updateStatus = useUpdateJobStatus()
   const { getToken } = useAuthContext()
-  const { data: atsData } = useAtsScore(job.id, showAts && job.atsStatus === 'done')
 
   const isGenerating = job.cvGenerationStatus === 'queued' || job.cvGenerationStatus === 'processing'
   const { data: genStatus } = useGenerationStatus(job.id, isGenerating)
@@ -63,7 +64,9 @@ const JobItem = ({ job, onDelete, onGenerate }: JobItemProps) => {
       const blob = await response.blob()
       const blobUrl = URL.createObjectURL(blob)
       const a = document.createElement('a')
-      const userName = user?.email.split('@')[0] ?? 'cv'
+      const firstName = user?.firstName?.toLocaleLowerCase()
+      const lastName = user?.lastName?.toLocaleLowerCase()
+      const userName = firstName && lastName ? `${firstName}_${lastName}` : (user?.email.split('@')[0] ?? 'cv')
       a.href = blobUrl
       a.download = `${userName}_cv.pdf`
       a.click()
@@ -74,6 +77,9 @@ const JobItem = ({ job, onDelete, onGenerate }: JobItemProps) => {
   }
 
   const cvDone = job.cvGenerationStatus === 'done' || genStatus?.status === 'done'
+
+  const toggleAts = (side: 'uploaded' | 'generated') =>
+    setExpandedAts((prev) => (prev === side ? null : side))
 
   return (
     <motion.div
@@ -87,20 +93,33 @@ const JobItem = ({ job, onDelete, onGenerate }: JobItemProps) => {
       <div className='flex items-start justify-between gap-2'>
         <div className='flex-1 min-w-0'>
           <p className='text-sm font-medium text-navy truncate'>{job.title}</p>
-          <p className='text-xs text-navy-muted truncate'>{job.company}</p>
-          <div className='flex items-center gap-2 mt-1'>
+          <div className='mt-1 flex flex-col gap-1 items-start'>
+            <p className='text-xs text-navy-muted truncate'>{job.company}</p>
             <p className='text-xs text-navy-muted opacity-60'>{formatDate(job.createdAt)}</p>
             {job.atsStatus === 'queued' || job.atsStatus === 'processing' ? (
-              <span className='text-xs text-navy-muted opacity-60'>ATS scoring...</span>
+              <p className='text-xs text-navy-muted opacity-60'>CV scoring...</p>
             ) : job.atsStatus === 'done' && job.atsScore !== null ? (
               <button
-                onClick={() => setShowAts((v) => !v)}
+                onClick={() => toggleAts('uploaded')}
                 className='text-xs font-medium text-navy-muted hover:opacity-80 transition-opacity'
               >
-                ATS: <span className={job.atsScore >= 70 ? 'text-green-600' : job.atsScore >= 40 ? 'text-amber-600' : 'text-red-600'}>{job.atsScore}/100</span>
+                CV: <span className={scoreColor(job.atsScore)}>{job.atsScore}/100</span>
               </button>
             ) : job.atsStatus === 'failed' ? (
-              <span className='text-xs text-red-400 opacity-80'>ATS failed</span>
+              <p className='text-xs text-red-400 opacity-80'>CV score failed</p>
+            ) : null}
+
+            {job.generatedCvAtsStatus === 'queued' || job.generatedCvAtsStatus === 'processing' ? (
+              <p className='text-xs text-navy-muted opacity-60'>Tailored scoring...</p>
+            ) : job.generatedCvAtsStatus === 'done' && job.generatedCvAtsScore !== null ? (
+              <button
+                onClick={() => toggleAts('generated')}
+                className='text-xs font-medium text-navy-muted hover:opacity-80 transition-opacity'
+              >
+                Tailored: <span className={scoreColor(job.generatedCvAtsScore)}>{job.generatedCvAtsScore}/100</span>
+              </button>
+            ) : job.generatedCvAtsStatus === 'failed' ? (
+              <p className='text-xs text-red-400 opacity-80'>Tailored score failed</p>
             ) : null}
           </div>
 
@@ -163,7 +182,7 @@ const JobItem = ({ job, onDelete, onGenerate }: JobItemProps) => {
       </div>
 
       <AnimatePresence>
-        {showAts && atsData?.explanation != null && (
+        {expandedAts === 'uploaded' && job.atsExplanation && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
@@ -172,11 +191,31 @@ const JobItem = ({ job, onDelete, onGenerate }: JobItemProps) => {
             className='overflow-hidden'
           >
             <div className='relative text-xs text-navy-muted bg-surface border border-border rounded-lg p-2 pr-6 leading-relaxed'>
-              {atsData.explanation}
+              <span className='font-medium text-navy'>CV: </span>{job.atsExplanation}
               <button
-                onClick={() => setShowAts(false)}
+                onClick={() => setExpandedAts(null)}
                 className='absolute top-1.5 right-1.5 text-navy-muted hover:text-navy transition-colors'
-                aria-label='Close ATS explanation'
+                aria-label='Close explanation'
+              >
+                <X size={12} />
+              </button>
+            </div>
+          </motion.div>
+        )}
+        {expandedAts === 'generated' && job.generatedCvAtsExplanation && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.15 }}
+            className='overflow-hidden'
+          >
+            <div className='relative text-xs text-navy-muted bg-surface border border-border rounded-lg p-2 pr-6 leading-relaxed'>
+              <span className='font-medium text-navy'>Tailored: </span>{job.generatedCvAtsExplanation}
+              <button
+                onClick={() => setExpandedAts(null)}
+                className='absolute top-1.5 right-1.5 text-navy-muted hover:text-navy transition-colors'
+                aria-label='Close explanation'
               >
                 <X size={12} />
               </button>

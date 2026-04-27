@@ -10,7 +10,18 @@ export const POLLING_INTERVAL_MS = 5_000
 
 // Chrome storage keys
 export const STORAGE_KEYS = {
+  AUTH: 'destacai_auth',
+  PENDING_VERIFICATION: 'destacai_pending_verification',
+  PENDING_SIGNUP: 'destacai_pending_signup',
   PENDING_DESCRIPTION: 'pendingDescription',
   PENDING_TITLE: 'pendingTitle',
   PENDING_COMPANY: 'pendingCompany',
+} as const
+
+// React Query cache keys
+export const QUERY_KEYS = {
+  JOBS: 'jobs',
+  USER: 'user',
+  GENERATION_STATUS: 'generation-status',
+  ATS_SCORE: 'ats-score',
 } as const

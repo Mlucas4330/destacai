@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAuthContext } from '@features/auth/context/AuthContext'
 import { createApiClient } from '@lib/api'
-import { POLLING_INTERVAL_MS } from '@shared/constants'
+import { POLLING_INTERVAL_MS, QUERY_KEYS } from '@shared/constants'
 
 interface GenerationStatus {
   status: 'idle' | 'queued' | 'processing' | 'done' | 'failed'
@@ -21,7 +21,7 @@ export function useGenerateCV() {
     mutationFn: (jobId: string) =>
       api.post<{ status: string }>(`/generate/${jobId}`),
     onSuccess: (_, jobId) => {
-      qc.invalidateQueries({ queryKey: ['generation-status', jobId] })
+      qc.invalidateQueries({ queryKey: [QUERY_KEYS.GENERATION_STATUS, jobId] })
     },
   })
 }
@@ -29,7 +29,7 @@ export function useGenerateCV() {
 export function useGenerationStatus(jobId: string, enabled: boolean) {
   const api = useApi()
   return useQuery({
-    queryKey: ['generation-status', jobId],
+    queryKey: [QUERY_KEYS.GENERATION_STATUS, jobId],
     queryFn: () => api.get<GenerationStatus>(`/generate/${jobId}/status`),
     enabled,
     refetchInterval: (query) => {

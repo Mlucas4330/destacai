@@ -3,12 +3,14 @@ import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { RefreshCw } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { useQueryClient } from '@tanstack/react-query'
 import { ApiError } from '@lib/api'
 import { useGenerateCV, useGenerationStatus } from '../hooks/useGenerateCV'
 import useSelectedJob from '../hooks/useSelectedJob'
 
 const GenerateCV = () => {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const job = useSelectedJob()
   const [isPolling, setIsPolling] = useState(false)
   const ran = useRef(false)
@@ -38,14 +40,15 @@ const GenerateCV = () => {
 
   useEffect(() => {
     if (!statusData) return
-    if (statusData.status === 'done' && statusData.downloadUrl) {
+    if (statusData.status === 'done') {
+      queryClient.invalidateQueries({ queryKey: ['jobs'] })
       navigate('/')
     }
     if (statusData.status === 'failed') {
       toast.error(statusData.error ?? 'CV generation failed. Please try again.')
       navigate('/')
     }
-  }, [statusData, navigate])
+  }, [statusData, navigate, queryClient])
 
   return (
     <motion.div

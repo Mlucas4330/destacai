@@ -8,6 +8,9 @@ import Jobs from '@pages/Jobs'
 import Config from '@pages/Config'
 import SignIn from '@pages/SignIn'
 import SignUp from '@pages/SignUp'
+import VerifyCode from '@pages/VerifyCode'
+import ForgotPassword from '@pages/ForgotPassword'
+import ResetPassword from '@pages/ResetPassword'
 import AddJob from '@features/jobs/components/AddJob'
 import GenerateCV from '@features/jobs/components/GenerateCV'
 import AuthGate from '@features/auth/components/AuthGate'
@@ -66,6 +69,9 @@ const App = (): React.ReactNode => {
           <Routes>
             <Route path='/sign-in' element={<SignIn />} />
             <Route path='/sign-up' element={<SignUp />} />
+            <Route path='/verify-code' element={<VerifyCode />} />
+            <Route path='/forgot-password' element={<ForgotPassword />} />
+            <Route path='/reset-password' element={<ResetPassword />} />
             <Route
               path='/*'
               element={
@@ -78,6 +84,7 @@ const App = (): React.ReactNode => {
           <Toaster
             position='bottom-center'
             toastOptions={{
+              duration: 2000,
               style: {
                 background: '#1e2333',
                 color: '#f7f6f3',

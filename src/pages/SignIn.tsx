@@ -14,7 +14,7 @@ const SignIn = () => {
   const { login } = useAuthContext()
   const navigate = useNavigate()
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault()
     setLoading(true)
     try {
@@ -62,6 +62,11 @@ const SignIn = () => {
           autoComplete='current-password'
           required
         />
+        <div className='flex justify-end'>
+          <Link to='/forgot-password' className='text-xs text-navy-muted underline underline-offset-2'>
+            Forgot password?
+          </Link>
+        </div>
         <Button type='submit' variant='primary' className='w-full' disabled={loading}>
           {loading ? 'Signing in…' : 'Sign in'}
         </Button>

@@ -15,6 +15,9 @@ export interface Job {
   cvGenerationError: string | null
   cvR2Key: string | null
   createdAt: string
+  generatedCvAtsStatus: ProcessingStatus
+  generatedCvAtsScore: number | null
+  generatedCvAtsExplanation: string | null
 }
 
 export interface UserProfile {
@@ -25,4 +28,6 @@ export interface UserProfile {
   generationsLimit: number
   cvFileName: string | null
   hasCv: boolean
+  firstName: string | null
+  lastName: string | null
 }
