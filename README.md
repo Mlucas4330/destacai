@@ -36,8 +36,9 @@ Then I evolved the project to include a full backend, authentication, ATS scorin
 flowchart TD
     A([user opens destacai]) --> B{authenticated?}
 
-    B -->|No| C([sign in with email/password, Google or GitHub])
-    C --> D{cv uploaded?}
+    B -->|No| C([sign in with email/password])
+    C --> C1([verification code sent via email - expires in 1 hour])
+    C1 --> D{cv uploaded?}
     B -->|Yes| D
 
     D -->|No| E([upload CV on config screen - stored in R2])
@@ -50,7 +51,7 @@ flowchart TD
     H -->|No| I([saves job with status badge])
     H -->|Yes| J{free tier limit reached?}
 
-    J -->|No| K([queues CV generation - Groq Llama 3.3 70B])
+    J -->|No| K([queues CV generation - GPT-4o-mini])
     J -->|Yes| L([upgrade to paid - GPT-4o])
     L --> K
 
@@ -66,12 +67,14 @@ flowchart TD
 
 ## Functional Requirements
 
-- User signs in with email/password, Google, or GitHub via Clerk
+- User signs in with email/password using custom auth logic
+- Sign-up triggers a verification code sent via Brevo - expires in 1 hour
+- Forgot password also sends a verification code to the user's email via Brevo
 - User uploads their CV once - stored securely in the backend
 - Clicking a LinkedIn job description captures it and shows an ATS score (0–100 with explanation)
 - ATS scoring is always free with no generation limit
 - User can generate a tailored CV (5 generations/month on free tier, unlimited on paid)
-- Free tier uses Groq (Llama 3.3 70B); paid tier uses GPT-4o
+- Free tier uses GPT-4o-mini; paid tier uses GPT-4o
 - Jobs are synced across devices via backend persistence
 - Each job has a status badge: Applied / Interview / Rejected / Offer
 - User can delete individual jobs or clear all data
@@ -87,18 +90,20 @@ flowchart TD
 - CV files stored in Cloudflare R2
 - Jobs and metadata stored in Postgres
 - CV generation is queued via BullMQ - not blocking, handled by a background worker
-- Expected CV generation time: under 30 seconds with Groq; up to 60 seconds with GPT-4o
+- Expected CV generation time: under 30 seconds with GPT-4o-mini; up to 60 seconds with GPT-4o
+- Transactional emails (verification code, password reset) sent via Brevo
 
 ## Architecture
 
 ```
 Chrome Extension (React + TypeScript + Vite)
-  └── Clerk (email/password, Google, GitHub auth)
+  └── Custom auth (email/password, JWT-based session)
   └── React Query (all server state - no raw fetch)
 
 Backend (Hono on Railway)
   ├── API service     - auth middleware, REST endpoints, Stripe webhooks
-  └── Worker service  - BullMQ consumer, CV generation, ATS scoring, R2 uploads
+  ├── Worker service  - BullMQ consumer, CV generation, ATS scoring, R2 uploads
+  └── Brevo           - transactional emails (verification code, password reset)
 
 Infrastructure
   ├── Redis (Railway addon)     - BullMQ job queue
@@ -112,7 +117,7 @@ Infrastructure
 |---|---|---|
 | ATS score (0–100) | Unlimited | Unlimited |
 | CV generation | 5 / month | Unlimited |
-| LLM model | Groq - Llama 3.3 70B | GPT-4o |
+| LLM model | GPT-4o-mini | GPT-4o |
 | Multi-device sync | Yes | Yes |
 | Job status badge | Yes | Yes |
 
@@ -120,7 +125,7 @@ Infrastructure
 
 ### LLM cost model
 
-Users no longer provide their own API key. The backend selects the model based on the user's subscription tier. Free users get Groq's free tier (Llama 3.3 70B - fast, capable, no cost). Paid users get GPT-4o. This removes signup friction and creates a clear, felt quality difference between tiers rather than a pure feature gate.
+Users no longer provide their own API key. The backend selects the model based on the user's subscription tier. Free users get GPT-4o-mini (fast, low cost). Paid users get GPT-4o. This removes signup friction and creates a clear, felt quality difference between tiers rather than a pure feature gate.
 
 ### Queue over inline generation
 
@@ -134,9 +139,9 @@ CV generation can take 30–60 seconds. Serverless functions on most platforms t
 
 R2 offers 10GB storage and 1M operations/month free with no egress fees and an S3-compatible API. MinIO requires self-hosting a stateful service. Supabase Storage's free tier caps at 1GB with egress costs. R2 is the lowest-ops, lowest-cost option at all scales.
 
-### Clerk over Supabase Auth
+### Custom auth over Clerk
 
-Clerk ships `@clerk/chrome-extension`, an official package that handles email/password auth and the OAuth popup-to-tab-back-to-extension flow for Google and GitHub login. This flow is non-trivial to implement manually. Building it on Supabase Auth would require custom `chrome.identity.launchWebAuthFlow` wiring. The DX savings justify the separate service.
+Clerk was the original choice and ships `@clerk/chrome-extension` specifically for extensions. In practice, the package had compatibility issues with the Chrome extension environment that couldn't be worked around. The project now uses custom email/password auth: hashed passwords, JWT-based sessions, and verification codes sent via Brevo for both sign-up and password reset.
 
 ### CV generation approach
 
@@ -179,7 +184,7 @@ src/
 ## Libraries
 
 **Extension:**
-- **@clerk/chrome-extension** - email/password, Google and GitHub auth with extension-aware OAuth flow
+- **Custom auth** - email/password with JWT sessions, verification codes, and password reset via Brevo
 - **React Query** - server state, caching, background sync
 - **Zod** - schema validation for API responses
 - **Tailwind CSS v4** - utility-first styling
@@ -191,7 +196,8 @@ src/
 **Backend (Hono on Railway):**
 - **Hono** - TypeScript-first web framework
 - **BullMQ** - Redis-backed job queue for CV generation and ATS scoring
-- **Vercel AI SDK** - LLM provider abstraction (Groq, OpenAI)
+- **Vercel AI SDK** - LLM provider abstraction (OpenAI GPT-4o-mini / GPT-4o)
+- **Brevo** - transactional email API for verification codes and password reset
 - **@react-pdf/renderer** - server-side PDF generation from structured CV data
 - **pdfjs-dist** - PDF text extraction from uploaded CVs
 - **@aws-sdk/client-s3** - Cloudflare R2 file upload/download (S3-compatible)

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "DestacAI",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "Generate custom CVs using AI",
   "permissions": [
     "storage",
@@ -21,7 +21,6 @@
     }
   ],
   "host_permissions": [
-    "http://localhost:3000/*",
     "https://destacai-api-production.up.railway.app/*"
   ],
   "background": {
