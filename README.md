@@ -36,7 +36,14 @@ Then I evolved the project to include a full backend, authentication, ATS scorin
 flowchart TD
     A([user opens destacai]) --> B{authenticated?}
 
-    B -->|No| C([sign in with email/password])
+    B -->|No| G1([add job manually - title/company auto-extracted via AI])
+    G1 --> G2([ATS score shown after CV generation - guest sees score])
+    G2 --> G3{guest generation limit reached? - 5 total / IP-based soft limit}
+    G3 -->|No| G4([queues CV generation - GPT-4o-mini])
+    G3 -->|Yes| C([sign in with email/password])
+    G4 --> G5([custom CV generated and downloaded as PDF])
+
+    B -->|No| C
     C --> C1([verification code sent via email - expires in 1 hour])
     C1 --> D{cv uploaded?}
     B -->|Yes| D
@@ -63,6 +70,7 @@ flowchart TD
 
     style A fill:#c0392b,color:#fff
     style M fill:#27ae60,color:#fff
+    style G5 fill:#27ae60,color:#fff
 ```
 
 ## Functional Requirements
@@ -92,6 +100,7 @@ flowchart TD
 - CV generation is queued via BullMQ - not blocking, handled by a background worker
 - Expected CV generation time: under 30 seconds with GPT-4o-mini; up to 60 seconds with GPT-4o
 - Transactional emails (verification code, password reset) sent via Brevo
+- Guest CV generation is limited to 5 total per `guestId`; a secondary IP-based check blocks further generations if the same IP is seen with more than `IP_GUEST_LIMIT` distinct guestIds within 24 hours (default: 3)
 
 ## Architecture
 
@@ -113,13 +122,14 @@ Infrastructure
 
 ## Tiers
 
-| Feature | Free | Paid |
-|---|---|---|
-| ATS score (0–100) | Unlimited | Unlimited |
-| CV generation | 5 / month | Unlimited |
-| LLM model | GPT-4o-mini | GPT-4o |
-| Multi-device sync | Yes | Yes |
-| Job status badge | Yes | Yes |
+| Feature | Guest (unauthenticated) | Free | Paid |
+|---|---|---|---|
+| ATS score (0–100) | After CV generation | Unlimited | Unlimited |
+| CV generation | 5 total (IP soft-limited) | 5 / month | Unlimited |
+| Auto title/company extraction | Yes (auto, on job add) | Yes (auto, on job add) | Yes (manual "Extract with AI" also available) |
+| LLM model | GPT-4o-mini | GPT-4o-mini | GPT-4o |
+| Multi-device sync | No | Yes | Yes |
+| Job status badge | No | Yes | Yes |
 
 ## Trade-offs
 
