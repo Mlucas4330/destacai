@@ -18,7 +18,7 @@ const useAddJob = (onSave: (job: Job) => void) => {
   const [isExtracting, setIsExtracting] = useState(false)
 
   const createJob = useCreateJob()
-  const { getToken, isSignedIn } = useAuthContext()
+  const { getToken } = useAuthContext()
 
   useEffect(() => {
     const api = createApiClient(getToken)
@@ -33,7 +33,6 @@ const useAddJob = (onSave: (job: Job) => void) => {
         if (pendingTitle) setTitle(pendingTitle)
         if (pendingCompany) setCompany(pendingCompany)
 
-        // Auto-extract for all users (guests & signed-in)
         if (desc && (!pendingTitle || !pendingCompany)) {
           setIsExtracting(true)
           try {
