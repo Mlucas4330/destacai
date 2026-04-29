@@ -33,8 +33,8 @@ const useAddJob = (onSave: (job: Job) => void) => {
         if (pendingTitle) setTitle(pendingTitle)
         if (pendingCompany) setCompany(pendingCompany)
 
-        // Skip LLM extraction for guests — they fill in manually
-        if (isSignedIn && desc && (!pendingTitle || !pendingCompany)) {
+        // Auto-extract for all users (guests & signed-in)
+        if (desc && (!pendingTitle || !pendingCompany)) {
           setIsExtracting(true)
           try {
             const extracted = await api.post<{ title: string; company: string }>('/jobs/extract', { description: desc })
