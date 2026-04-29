@@ -36,7 +36,7 @@ const useAddJob = (onSave: (job: Job) => void) => {
         if (desc && (!pendingTitle || !pendingCompany)) {
           setIsExtracting(true)
           try {
-            const extracted = await api.post<{ title: string; company: string }>('/jobs/extract', { description: desc })
+            const extracted = await api.post<{ title: string; company: string }>('/guest/extract', { description: desc })
             if (!pendingTitle && extracted.title) setTitle(extracted.title)
             if (!pendingCompany && extracted.company) setCompany(extracted.company)
           } catch {
@@ -73,7 +73,7 @@ const useAddJob = (onSave: (job: Job) => void) => {
     setIsExtracting(true)
     try {
       const api = createApiClient(getToken)
-      const extracted = await api.post<{ title: string; company: string }>('/jobs/extract', { description: description.trim() })
+      const extracted = await api.post<{ title: string; company: string }>('/guest/extract', { description: description.trim() })
       if (extracted.title) { setTitle(extracted.title); persistField(STORAGE_KEYS.PENDING_TITLE, extracted.title) }
       if (extracted.company) { setCompany(extracted.company); persistField(STORAGE_KEYS.PENDING_COMPANY, extracted.company) }
     } catch {
