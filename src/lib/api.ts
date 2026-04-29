@@ -12,7 +12,7 @@ class ApiError extends Error {
 export function createApiClient(getToken: GetToken) {
   async function headers(extra?: HeadersInit): Promise<HeadersInit> {
     const token = await getToken()
-    return { Authorization: `Bearer ${token}`, ...extra }
+    return token ? { Authorization: `Bearer ${token}`, ...extra } : { ...extra }
   }
 
   async function request<T>(method: string, path: string, body?: unknown): Promise<T> {
