@@ -1,11 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
 import { useAuthContext } from '@features/auth/context/AuthContext'
 import { useGuestContext } from '@features/auth/context/GuestContext'
-import { createApiClient } from '@lib/api'
+import { createApiClient, BASE_URL } from '@lib/api'
 import type { ProcessingStatus } from '@shared/types'
 import { POLLING_INTERVAL_MS, QUERY_KEYS } from '@shared/constants'
-
-const BASE_URL = import.meta.env.VITE_API_URL as string
 
 export interface AtsSideResult {
   status: ProcessingStatus
@@ -31,7 +29,7 @@ function isDone(data: AtsResult | undefined): boolean {
 }
 
 export function useAtsScore(jobId: string, enabled: boolean) {
-  const { isSignedIn } = useAuthContext()
+  const { isSignedIn, isLoaded } = useAuthContext()
   const { guestId } = useGuestContext()
   const api = useApi()
 
@@ -42,7 +40,7 @@ export function useAtsScore(jobId: string, enabled: boolean) {
       if (!res.ok) throw new Error('Failed to fetch ATS score')
       return res.json() as Promise<AtsResult>
     },
-    enabled: !isSignedIn && enabled && !!guestId,
+    enabled: isLoaded && !isSignedIn && enabled && !!guestId,
     refetchInterval: (query) => {
       return isDone(query.state.data) ? false : POLLING_INTERVAL_MS
     },
@@ -51,7 +49,7 @@ export function useAtsScore(jobId: string, enabled: boolean) {
   const authQuery = useQuery({
     queryKey: [QUERY_KEYS.ATS_SCORE, jobId, 'auth'],
     queryFn: () => api.get<AtsResult>(`/ats/${jobId}`),
-    enabled: isSignedIn && enabled,
+    enabled: isLoaded && isSignedIn && enabled,
     refetchInterval: (query) => {
       return isDone(query.state.data) ? false : POLLING_INTERVAL_MS
     },
