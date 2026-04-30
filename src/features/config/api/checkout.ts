@@ -1,4 +1,4 @@
-import { createApiClient } from '@lib/api'
+import { createApiClient } from '@/lib/api.client'
 
 export interface CheckoutResponse {
   checkoutUrl: string

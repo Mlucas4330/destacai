@@ -1,6 +1,11 @@
 import type { GuestJob, UserProfile } from "@/shared/types"
 
-export interface LoginResponse {
+export interface SignInRequest {
+  email: string
+  password: string
+}
+
+export interface SignInResponse {
   token: string
   user: { email: string }
 }
@@ -19,7 +24,7 @@ export interface ResetPasswordResponse {
   message: string
 }
 
-export interface AuthState {
+export interface UserProps {
   token: string | null
   email: string | null
 }
@@ -43,6 +48,16 @@ export interface AuthContextValue {
   clearPendingVerification: () => Promise<void>
 }
 
+export interface VerifyCodeFormProps {
+  email: string
+  purpose: 'email-verification' | 'password-reset'
+}
+
+export interface ResetPasswordFormProps {
+  email: string
+  code: string
+}
+
 export interface GuestContextValue {
   guestId: string
   guestJobs: GuestJob[]
@@ -58,4 +73,6 @@ export interface GuestContextValue {
   triggerLimitModal: () => void
   dismissLimitModal: () => void
   clearGuestData: () => Promise<void>
+  handleSignIn: () => void
+  handleSignUp: () => void
 }

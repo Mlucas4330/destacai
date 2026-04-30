@@ -1,8 +1,10 @@
 import { motion } from 'framer-motion'
+import { useNavigate } from 'react-router-dom'
 
 interface ButtonProps {
   children: React.ReactNode
   onClick?: () => void
+  to?: string
   variant?: 'primary' | 'secondary' | 'danger'
   disabled?: boolean
   type?: 'button' | 'submit' | 'reset'
@@ -18,15 +20,18 @@ const variantClasses = {
 const Button = ({
   children,
   onClick,
+  to,
   variant = 'primary',
   disabled = false,
   type = 'button',
   className = '',
 }: ButtonProps) => {
+  const navigate = useNavigate()
+
   return (
     <motion.button
       type={type}
-      onClick={onClick}
+      onClick={to ? () => navigate(to) : onClick}
       disabled={disabled}
       whileTap={disabled ? undefined : { scale: 0.97 }}
       className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors cursor-pointer disabled:cursor-not-allowed ${variantClasses[variant]} ${className}`}

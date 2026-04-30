@@ -1,21 +1,11 @@
-import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { useGuestContext } from '@/features/auth/context/GuestContext'
+import { useGuestContext } from '@/features/auth/stores/GuestContext'
 import Button from '@/shared/components/Button'
 
 export default function GuestLimitModal() {
-  const { dismissLimitModal } = useGuestContext()
-  const navigate = useNavigate()
+  const { handleSignIn, handleSignUp, dismissLimitModal, showLimitModal } = useGuestContext()
 
-  const handleSignUp = () => {
-    dismissLimitModal()
-    navigate('/sign-up')
-  }
-
-  const handleSignIn = () => {
-    dismissLimitModal()
-    navigate('/sign-in')
-  }
+  if (!showLimitModal) return
 
   return (
     <div className='absolute inset-0 z-50 flex items-center justify-center bg-black/40 px-4'>

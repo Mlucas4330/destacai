@@ -1,12 +1,12 @@
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { Sparkles } from 'lucide-react'
-import Input from '@shared/components/Input'
-import Button from '@shared/components/Button'
+import Input from '@/shared/components/Input'
+import Button from '@/shared/components/Button'
 import useAddJob from '../hooks/useAddJob'
-import { useUser } from '@features/config/hooks/useUser'
-import { useAuthContext } from '@features/auth/context/AuthContext'
-import { STORAGE_KEYS } from '@shared/constants'
+import { useUser } from '@/features/config/hooks/useUser'
+import { useAuthContext } from '@/features/auth/stores/auth'
+import { STORAGE_KEYS } from '@/shared/constants'
 
 const AddJob = () => {
   const navigate = useNavigate()

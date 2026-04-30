@@ -1,10 +1,10 @@
 import { useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useAuthContext } from '@features/auth/context/AuthContext'
-import { useGuestContext } from '@features/auth/context/GuestContext'
-import * as generationApi from '@features/jobs/api/generation'
-import { POLLING_INTERVAL_MS, QUERY_KEYS } from '@features/jobs/constants'
-import { FREE_TIER_LIMIT, ADMIN_BYPASS } from '@features/config/constants'
+import { useAuthContext } from '@/features/auth/stores/auth'
+import { useGuestContext } from '@/features/auth/stores/GuestContext'
+import * as generationApi from '@/features/jobs/api/generation'
+import { POLLING_INTERVAL_MS, QUERY_KEYS } from '@/features/jobs/constants'
+import { FREE_TIER_LIMIT, ADMIN_BYPASS } from '@/features/config/constants'
 import toast from 'react-hot-toast'
 
 interface GenerationStatus {

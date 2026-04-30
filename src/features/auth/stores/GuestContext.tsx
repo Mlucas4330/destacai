@@ -1,9 +1,8 @@
 import { createContext, useContext, useEffect, useState, useCallback } from 'react'
-import * as chromeStorage from '@/lib/chromeStorage'
-import { STORAGE_KEYS } from '@/features/config/constants'
+import { STORAGE_KEYS } from '@/shared/constants'
 import type { GuestJob } from '@/shared/types'
 import type { GuestContextValue } from '../types'
-import * as localStorage from '@/lib/localStorage'
+import { useNavigate } from 'react-router-dom'
 
 const GuestContext = createContext<GuestContextValue | null>(null)
 
@@ -13,31 +12,27 @@ export function GuestProvider({ children }: { children: React.ReactNode }) {
   const [guestGenerationsUsed, setGuestGenerationsUsed] = useState(0)
   const [guestCvR2Key, setGuestCvR2KeyState] = useState<string | null>(null)
   const [showLimitModal, setShowLimitModal] = useState(false)
+  const navigate = useNavigate()
 
   useEffect(() => {
     (async () => {
-      const result = await localStorage.get([
-        STORAGE_KEYS.GUEST_ID,
-        STORAGE_KEYS.GUEST_JOBS,
-        STORAGE_KEYS.GUEST_GENERATIONS_USED,
-        STORAGE_KEYS.GUEST_CV_R2_KEY,
-      ])
-      let id = result[STORAGE_KEYS.GUEST_ID] as string | undefined
+      let id = ls<string>(STORAGE_KEYS.GUEST_ID)
       if (!id) {
         id = crypto.randomUUID()
-        await chromeStorage.set({ [STORAGE_KEYS.GUEST_ID]: id })
+        await chrome.storage.local.set({ [STORAGE_KEYS.GUEST_ID]: id })
+        localStorage.setItem(STORAGE_KEYS.GUEST_ID, JSON.stringify(id))
       }
       setGuestId(id)
-      setGuestJobs((result[STORAGE_KEYS.GUEST_JOBS] as GuestJob[] | undefined) ?? [])
-      setGuestGenerationsUsed((result[STORAGE_KEYS.GUEST_GENERATIONS_USED] as number | undefined) ?? 0)
-      setGuestCvR2KeyState((result[STORAGE_KEYS.GUEST_CV_R2_KEY] as string | undefined) ?? null)
+      setGuestJobs(ls<GuestJob[]>(STORAGE_KEYS.GUEST_JOBS) ?? [])
+      setGuestGenerationsUsed(ls<number>(STORAGE_KEYS.GUEST_GENERATIONS_USED) ?? 0)
+      setGuestCvR2KeyState(ls<string>(STORAGE_KEYS.GUEST_CV_R2_KEY) ?? null)
     })()
   }, [])
 
   const addGuestJob = useCallback(async (job: GuestJob) => {
     setGuestJobs((prev) => {
       const next = [job, ...prev]
-      localStorage.set({ [STORAGE_KEYS.GUEST_JOBS]: next })
+      lsSet(STORAGE_KEYS.GUEST_JOBS, next)
       return next
     })
   }, [])
@@ -45,20 +40,20 @@ export function GuestProvider({ children }: { children: React.ReactNode }) {
   const deleteGuestJob = useCallback(async (id: string) => {
     setGuestJobs((prev) => {
       const next = prev.filter((j) => j.id !== id)
-      localStorage.set({ [STORAGE_KEYS.GUEST_JOBS]: next })
+      lsSet(STORAGE_KEYS.GUEST_JOBS, next)
       return next
     })
   }, [])
 
   const clearGuestJobs = useCallback(async () => {
     setGuestJobs([])
-    await localStorage.remove(STORAGE_KEYS.GUEST_JOBS)
+    lsRemove(STORAGE_KEYS.GUEST_JOBS)
   }, [])
 
   const updateGuestJob = useCallback(async (id: string, patch: Partial<GuestJob>) => {
     setGuestJobs((prev) => {
       const next = prev.map((j) => (j.id === id ? { ...j, ...patch } : j))
-      localStorage.set({ [STORAGE_KEYS.GUEST_JOBS]: next })
+      lsSet(STORAGE_KEYS.GUEST_JOBS, next)
       return next
     })
   }, [])
@@ -66,7 +61,7 @@ export function GuestProvider({ children }: { children: React.ReactNode }) {
   const incrementGuestGenerations = useCallback(async () => {
     setGuestGenerationsUsed((prev) => {
       const next = prev + 1
-      localStorage.set({ [STORAGE_KEYS.GUEST_GENERATIONS_USED]: next })
+      lsSet(STORAGE_KEYS.GUEST_GENERATIONS_USED, next)
       return next
     })
   }, [])
@@ -74,9 +69,9 @@ export function GuestProvider({ children }: { children: React.ReactNode }) {
   const setGuestCvR2Key = useCallback(async (key: string | null) => {
     setGuestCvR2KeyState(key)
     if (key === null) {
-      await localStorage.remove(STORAGE_KEYS.GUEST_CV_R2_KEY)
+      lsRemove(STORAGE_KEYS.GUEST_CV_R2_KEY)
     } else {
-      await localStorage.set({ [STORAGE_KEYS.GUEST_CV_R2_KEY]: key })
+      lsSet(STORAGE_KEYS.GUEST_CV_R2_KEY, key)
     }
   }, [])
 
@@ -84,7 +79,7 @@ export function GuestProvider({ children }: { children: React.ReactNode }) {
   const dismissLimitModal = useCallback(() => setShowLimitModal(false), [])
 
   const clearGuestData = useCallback(async () => {
-    await localStorage.remove([
+    lsRemove([
       STORAGE_KEYS.GUEST_JOBS,
       STORAGE_KEYS.GUEST_GENERATIONS_USED,
       STORAGE_KEYS.GUEST_CV_R2_KEY,
@@ -94,6 +89,16 @@ export function GuestProvider({ children }: { children: React.ReactNode }) {
     setGuestCvR2KeyState(null)
     setShowLimitModal(false)
   }, [])
+
+  const handleSignUp = () => {
+    dismissLimitModal()
+    navigate('/sign-up')
+  }
+
+  const handleSignIn = () => {
+    dismissLimitModal()
+    navigate('/sign-in')
+  }
 
   return (
     <GuestContext.Provider
@@ -112,6 +117,8 @@ export function GuestProvider({ children }: { children: React.ReactNode }) {
         triggerLimitModal,
         dismissLimitModal,
         clearGuestData,
+        handleSignIn,
+        handleSignUp
       }}
     >
       {children}

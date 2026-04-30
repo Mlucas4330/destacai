@@ -1,51 +1,32 @@
-import { createApiClient, BASE_URL } from '@lib/api'
-import type { UserProfile } from '@shared/types'
+import { fetchApi } from '@/lib/api.client'
+import type { UserProfile } from '@/shared/types'
 
 export interface UploadCVResponse {
   cvFileName: string
   cvR2Key: string
 }
 
-export async function getUserProfile(getToken: () => Promise<string | null>): Promise<UserProfile> {
-  const api = createApiClient(getToken)
-  return api.get<UserProfile>('/users/me')
+export function getUserProfile(token: string): Promise<UserProfile> {
+  return fetchApi<UserProfile>({ method: 'GET', path: '/users/me', token })
 }
 
-export async function uploadCV(getToken: () => Promise<string | null>, file: File): Promise<UploadCVResponse> {
-  const api = createApiClient(getToken)
+export function uploadCV(token: string, file: File): Promise<UploadCVResponse> {
   const formData = new FormData()
   formData.append('file', file)
-  return api.uploadFile<UploadCVResponse>('/cv/upload', formData)
+  return fetchApi<UploadCVResponse>({ method: 'POST', path: '/cv/upload', body: formData, token })
 }
 
-export async function uploadCVGuest(guestId: string, file: File): Promise<UploadCVResponse> {
+export function uploadCVGuest(guestId: string, file: File): Promise<UploadCVResponse> {
   const formData = new FormData()
   formData.append('file', file)
   formData.append('guestId', guestId)
-  const res = await fetch(`${BASE_URL}/guest/cv/upload`, {
-    method: 'POST',
-    body: formData,
-  })
-  if (!res.ok) {
-    const body = await res.json().catch(() => null)
-    throw new Error(body?.error ?? 'Upload failed')
-  }
-  return res.json()
+  return fetchApi<UploadCVResponse>({ method: 'POST', path: '/guest/cv/upload', body: formData })
 }
 
-export async function deleteCV(getToken: () => Promise<string | null>): Promise<void> {
-  const api = createApiClient(getToken)
-  await api.delete('/cv')
+export function deleteCV(token: string): Promise<void> {
+  return fetchApi<void>({ method: 'DELETE', path: '/cv', token })
 }
 
-export async function deleteCVGuest(guestId: string, cvR2Key: string): Promise<void> {
-  const res = await fetch(`${BASE_URL}/guest/cv`, {
-    method: 'DELETE',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ guestId, cvR2Key }),
-  })
-  if (!res.ok) {
-    const body = await res.json().catch(() => null)
-    throw new Error(body?.error ?? 'Failed to remove CV')
-  }
+export function deleteCVGuest(guestId: string, cvR2Key: string): Promise<void> {
+  return fetchApi<void>({ method: 'DELETE', path: '/guest/cv', body: { guestId, cvR2Key } })
 }

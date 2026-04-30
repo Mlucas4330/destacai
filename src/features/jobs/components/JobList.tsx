@@ -1,15 +1,8 @@
-import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X } from 'lucide-react'
-import type { Job } from '@shared/types'
 import JobItem from './JobItem'
-
-interface JobListProps {
-  jobs: Job[]
-  onDelete: (id: string) => void
-  onGenerate: (id: string) => void
-  onClearAll: () => void
-}
+import { useStatusHint } from '../hooks/useStatusHint'
+import type { JobListProps } from '../types'
 
 const listVariants = {
   hidden: {},
@@ -19,12 +12,7 @@ const listVariants = {
 }
 
 const JobList = ({ jobs, onDelete, onGenerate, onClearAll }: JobListProps) => {
-  const [showHint, setShowHint] = useState(() => localStorage.getItem('statusHintDismissed') !== 'true')
-
-  const dismissHint = () => {
-    localStorage.setItem('statusHintDismissed', 'true')
-    setShowHint(false)
-  }
+  const { showHint, dismissHint } = useStatusHint()
 
   return (
     <div className='flex flex-col gap-2 p-3'>
@@ -67,12 +55,7 @@ const JobList = ({ jobs, onDelete, onGenerate, onClearAll }: JobListProps) => {
       >
         <AnimatePresence initial={false}>
           {jobs.map((job) => (
-            <JobItem
-              key={job.id}
-              job={job}
-              onDelete={onDelete}
-              onGenerate={onGenerate}
-            />
+            <JobItem key={job.id} job={job} onDelete={onDelete} onGenerate={onGenerate} />
           ))}
         </AnimatePresence>
       </motion.div>

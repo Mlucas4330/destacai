@@ -1,11 +1,8 @@
 import { motion } from 'framer-motion'
 import { Upload } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
 import Button from '@/shared/components/Button'
 
 const NoCvState = () => {
-  const navigate = useNavigate()
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -23,7 +20,7 @@ const NoCvState = () => {
           Upload your CV in Settings to start saving jobs and generating tailored applications.
         </p>
       </div>
-      <Button variant='primary' onClick={() => navigate('/config')} className='text-xs px-4 py-1.5'>
+      <Button variant='primary' to='/config' className='text-xs px-4 py-1.5'>
         Go to Settings
       </Button>
     </motion.div>

@@ -1,10 +1,5 @@
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import toast from 'react-hot-toast'
-import Button from '@shared/components/Button'
-import Input from '@shared/components/Input'
-import { STORAGE_KEYS } from '@shared/constants'
-
+import { Link } from 'react-router-dom'
+import ForgotPasswordForm from '@/features/auth/components/ForgotPasswordForm'
 
 const ForgotPassword = () => {
   return (

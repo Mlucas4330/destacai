@@ -1,0 +1,39 @@
+{
+  "manifest_version": 3,
+  "name": "DestacAI",
+  "version": "3.0.0",
+  "description": "Generate custom CVs using AI",
+  "permissions": [
+    "storage",
+    "contextMenus",
+    "activeTab"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.linkedin.com/jobs/*",
+        "https://linkedin.com/jobs/*"
+      ],
+      "js": [
+        "contentScript.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "host_permissions": [
+    "http://localhost:3000/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "icons": {
+    "128": "icon.png"
+  },
+  "action": {
+    "default_popup": "index.html",
+    "default_title": "DestacAI",
+    "default_icon": {
+      "128": "icon.png"
+    }
+  }
+}

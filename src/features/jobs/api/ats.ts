@@ -1,5 +1,5 @@
-import { createApiClient, BASE_URL } from '@lib/api'
-import type { ProcessingStatus } from '@shared/types'
+import { createApiClient, BASE_URL } from '@/lib/api.client'
+import type { ProcessingStatus } from '@/shared/types'
 
 export interface AtsSideResult {
   status: ProcessingStatus

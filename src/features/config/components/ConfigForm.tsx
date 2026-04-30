@@ -1,15 +1,15 @@
 import { useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuthContext } from '@features/auth/context/AuthContext'
-import { useGuestContext } from '@features/auth/context/GuestContext'
+import { useAuthContext } from '@/features/auth/stores/auth'
+import { useGuestContext } from '@/features/auth/stores/GuestContext'
 import toast from 'react-hot-toast'
 import { AnimatePresence, motion } from 'framer-motion'
 import { FileText, Trash2, Upload, ExternalLink } from 'lucide-react'
 import { useUser, useUploadCV, useDeleteCV } from '../hooks/useUser'
-import { createApiClient } from '@lib/api'
-import Button from '@shared/components/Button'
-import IconButton from '@shared/components/IconButton'
-import { MAX_SIZE_BYTES, MAX_SIZE_MB, FREE_TIER_LIMIT } from '@shared/constants'
+import { createApiClient } from '@/lib/api.client'
+import Button from '@/shared/components/Button'
+import IconButton from '@/shared/components/IconButton'
+import { MAX_SIZE_BYTES, MAX_SIZE_MB, FREE_TIER_LIMIT } from '@/shared/constants'
 
 const ConfigForm = () => {
   const { signOut, getToken, isSignedIn } = useAuthContext()

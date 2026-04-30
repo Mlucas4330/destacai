@@ -1,29 +1,23 @@
-import { useQueryClient } from '@tanstack/react-query'
-import { useAuthContext } from '@/features/auth/context/AuthContext'
-import { useGuestContext } from '@/features/auth/context/GuestContext'
-import { QUERY_KEYS } from '@/shared/constants'
-import { BASE_URL } from '@/lib/api'
+// import { useQueryClient } from '@tanstack/react-query'
+// import { useAuthContext } from '@/features/auth/stores/auth'
+// import { useGuestContext } from '@/features/auth/stores/GuestContext'
+// import { QUERY_KEYS } from '@/shared/constants'
+// import { migrateGuest } from '../services/auth'
 
 export function useMigrateGuest() {
-  const { getToken } = useAuthContext()
-  const { guestId, guestJobs, guestCvR2Key, clearGuestData } = useGuestContext()
-  const qc = useQueryClient()
+  // const { getToken } = useAuthContext()
+  // const { guestId, guestJobs, guestCvR2Key, clearGuestData } = useGuestContext()
+  // const qc = useQueryClient()
 
-  return async () => {
-    if (!guestJobs.length && !guestCvR2Key) return
+  // return async () => {
+  //   if (!guestJobs.length && !guestCvR2Key) return
 
-    const token = await getToken()
-    await fetch(`${BASE_URL}/auth/migrate-guest`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ guestId, guestJobs, guestCvR2Key }),
-    })
+  //   const token = await getToken()
+  //   if (!token) return
 
-    await clearGuestData()
-    qc.invalidateQueries({ queryKey: [QUERY_KEYS.JOBS] })
-    qc.invalidateQueries({ queryKey: [QUERY_KEYS.USER] })
-  }
+  //   await migrateGuest(token, guestId, guestJobs, guestCvR2Key)
+  //   await clearGuestData()
+  //   qc.invalidateQueries({ queryKey: [QUERY_KEYS.JOBS] })
+  //   qc.invalidateQueries({ queryKey: [QUERY_KEYS.USER] })
+  // }
 }

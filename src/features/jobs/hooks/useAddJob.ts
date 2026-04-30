@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useCreateJob } from './useJobs'
-import { useAuthContext } from '@features/auth/context/AuthContext'
-import { createApiClient } from '@lib/api'
-import type { Job } from '@shared/types'
-import { STORAGE_KEYS } from '@shared/constants'
+import { useAuthContext } from '@/features/auth/stores/auth'
+import { createApiClient } from '@/lib/api.client'
+import type { Job } from '@/shared/types'
+import { STORAGE_KEYS } from '@/shared/constants'
 
 interface PendingStorage {
   pendingDescription?: string

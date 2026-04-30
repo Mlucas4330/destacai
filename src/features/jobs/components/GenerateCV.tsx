@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import { RefreshCw } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useQueryClient } from '@tanstack/react-query'
-import { ApiError } from '@lib/api'
+import { ApiError } from '@/lib/api.client'
 import { useGenerateCV, useGenerationStatus } from '../hooks/useGenerateCV'
 import useSelectedJob from '../hooks/useSelectedJob'
 

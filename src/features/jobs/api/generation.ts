@@ -1,4 +1,4 @@
-import { createApiClient, BASE_URL } from '@lib/api'
+import { createApiClient, BASE_URL } from '@/lib/api.client'
 
 export interface GenerationStatus {
   status: 'idle' | 'queued' | 'processing' | 'done' | 'failed'

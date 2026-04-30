@@ -1,35 +1,34 @@
-import { createApiClient } from '@lib/api'
-import type { Job, JobStatus } from '@shared/types'
+import { fetchApi } from '@/lib/api.client'
+import type { Job, JobStatus } from '@/shared/types'
 
-export async function getJobs(getToken: () => Promise<string | null>): Promise<Job[]> {
-  const api = createApiClient(getToken)
-  const response = await api.get<{ jobs: Job[] }>('/jobs')
-  return response.jobs
+export function getJobs(token: string): Promise<Job[]> {
+  return fetchApi<{ jobs: Job[] }>({ method: 'GET', path: '/jobs', token }).then((r) => r.jobs)
 }
 
-export async function createJob(
-  getToken: () => Promise<string | null>,
+export function createJob(
+  token: string,
   data: { title: string; company: string; description: string },
 ): Promise<Job> {
-  const api = createApiClient(getToken)
-  return api.post<Job>('/jobs', data)
+  return fetchApi<Job>({ method: 'POST', path: '/jobs', body: data, token })
 }
 
-export async function deleteJob(getToken: () => Promise<string | null>, jobId: string): Promise<void> {
-  const api = createApiClient(getToken)
-  await api.delete(`/jobs/${jobId}`)
+export function deleteJob(token: string, jobId: string): Promise<void> {
+  return fetchApi<void>({ method: 'DELETE', path: `/jobs/${jobId}`, token })
 }
 
-export async function clearJobs(getToken: () => Promise<string | null>): Promise<void> {
-  const api = createApiClient(getToken)
-  await api.delete('/jobs')
+export function clearJobs(token: string): Promise<void> {
+  return fetchApi<void>({ method: 'DELETE', path: '/jobs', token })
 }
 
-export async function updateJobStatus(
-  getToken: () => Promise<string | null>,
+export function updateJobStatus(
+  token: string,
   jobId: string,
   status: JobStatus,
 ): Promise<{ id: string; status: JobStatus }> {
-  const api = createApiClient(getToken)
-  return api.patch<{ id: string; status: JobStatus }>(`/jobs/${jobId}/status`, { status })
+  return fetchApi<{ id: string; status: JobStatus }>({
+    method: 'PATCH',
+    path: `/jobs/${jobId}/status`,
+    body: { status },
+    token,
+  })
 }
