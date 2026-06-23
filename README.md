@@ -2,8 +2,6 @@
 
 DestacAI is a micro-SaaS that generates a custom CV for each job you apply to, optimized for ATS filters, with a built-in score that tells you exactly why your current CV isn't making the cut.
 
-> **Status:** Now a **single Next.js 15 (App Router) app** (migrated 2026-06-19). Stripe/payments, guest users, and the credit system have been removed — it is **authenticated-users only**. CV generation and ATS scoring run in-process (no queue). See [CHANGELOG.md](./CHANGELOG.md) for history, [CLAUDE.md](./CLAUDE.md) and [.claude/rules/](./.claude/rules) for architecture and conventions. Some sections below still describe pre-migration behavior (credits/guests) and are being updated.
-
 # Problem
 
 Sometimes you're a skilled developer with great side projects and experience, however, still not getting the job you wanted. That happens with all of us. The problem is not you, it's how you're showing it. Nowadays companies are using AI ATS (Applicant Tracking System), automatically filtering you for not using specific keywords related to the job requirements.
@@ -57,14 +55,12 @@ flowchart TD
 
 ## Architecture
 
-DestacAI is a **single Next.js 15 (App Router) application** — one repo, one deploy.
+DestacAI is a **single Next.js 15 (App Router) application** - one repo, one deploy.
 
-- **Frontend** — React 19 client components (React Query, Zustand, React Hook Form + Zod, Tailwind v4, Framer Motion). Routes live in `src/app/` (route groups `(app)` and `(auth)`); page-level UI in `src/screens/`, feature code in `src/features/`, shared UI/utils in `src/shared/`, infra in `src/lib/`.
-- **Backend** — Next.js route handlers under `src/app/api/*` calling a ported service layer in `server/` (`features/*` → service/repository/dto/model, plus `db`, `lib`, `shared`). Uses Postgres (Drizzle ORM), Cloudflare R2 for CV PDFs, Brevo for email, and OpenAI for the LLM calls.
-- **Auth** — Auth.js (NextAuth v5): Credentials provider + JWT sessions, with email-code verification and password reset as custom API routes. `src/middleware.ts` guards authed routes.
-- **Async** — CV generation and ATS scoring run **in-process** as fire-and-forget background tasks (no queue/Redis). The client polls `/jobs` for status. This requires a long-running Node host (`next start`), not edge/serverless.
-
-> The app started as a Chrome extension, then a Vite SPA + Hono/BullMQ backend, and is now this single Next.js app. It is **authenticated-users only** — Stripe/payments, guest users, and the old credit system were removed.
+- **Frontend** - React 19 client components (React Query, Zustand, React Hook Form + Zod, Tailwind v4, Framer Motion). Routes live in `src/app/` (route groups `(app)` and `(auth)`); page-level UI in `src/screens/`, feature code in `src/features/`, shared UI/utils in `src/shared/`, infra in `src/lib/`.
+- **Backend** - Next.js route handlers under `src/app/api/*` calling a ported service layer in `server/` (`features/*` → service/repository/dto/model, plus `db`, `lib`, `shared`). Uses Postgres (Drizzle ORM), Cloudflare R2 for CV PDFs, Brevo for email, and OpenAI for the LLM calls.
+- **Auth** - Auth.js (NextAuth v5): Credentials provider + JWT sessions, with email-code verification and password reset as custom API routes. `src/middleware.ts` guards authed routes.
+- **Async** - CV generation and ATS scoring run **in-process** as fire-and-forget background tasks (no queue/Redis). The client polls `/jobs` for status. This requires a long-running Node host (`next start`), not edge/serverless.
 
 ## Functional Requirements
 
@@ -127,3 +123,4 @@ npm run dev                     # http://localhost:3000
 - `AUTH_SECRET` and `DATABASE_URL` are required to sign up / sign in. `R2_*`, `OPENAI_API_KEY`, and `BREVO_*` are only needed once you upload a CV, generate, or send verification emails.
 - Stop the database with `docker compose down` (data persists) or `docker compose down -v` (wipes it).
 - After changing `server/db/schema.ts`, run `npm run db:generate` then `npm run db:push` (or `db:migrate`).
+
