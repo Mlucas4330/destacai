@@ -78,14 +78,18 @@ flowchart TD
     B -->|Yes| D
 
     D -->|No| E([upload CV on settings screen - stored in R2])
-    D -->|Yes| F([add job - title/company auto-extracted via AI])
+    D -->|Yes| F([add job - AI extracts title, company, skills and requirements from the description])
     E --> F
 
-    F --> H([ATS scoring + CV generation run in-process])
-    H --> L([ATS score + custom CV ready])
+    F --> G([ATS scoring runs in-process, matching the CV against the extracted keywords])
+    G --> H([home screen - job saved with ATS score and status badge])
 
-    L --> M([home screen - job saved with status badge])
-    M --> N([update job status: Applied / Interview / Rejected / Offer])
+    H --> I{generate tailored CV?}
+    I -->|No| N([update job status: Saved / Applied / Interview / Rejected / Offer])
+    I -->|Yes| J([CV generation runs in-process])
+    J --> K([second ATS score computed on the generated CV])
+    K --> L([tailored CV ready - download, edit and re-score, or generate a cover letter])
+    L --> N
 
     style A fill:#c0392b,color:#fff
     style L fill:#27ae60,color:#fff
