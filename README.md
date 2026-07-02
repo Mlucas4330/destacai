@@ -28,7 +28,45 @@ While thinking on how to address those problems, I had an even better idea: What
 Based on this new idea, I created this User Flow using Figma:
 ![User Flow](./docs/user-flow.png)
 
-Then I evolved the project to include a full backend, authentication and ATS scoring.
+From that idea, the project evolved through several architectures. Almost every step actually *removed*
+infrastructure and narrowed scope as I recognized better choices:
+
+**Phase 1 - Browser extension, BYOK, no database.**
+The first working version was a browser extension. Users brought their own OpenAI key (BYOK), there was no
+backend and no database, and it could be used without an account.
+When I started testing it with my own CV and applying for jobs, I realized the project could possibly turn
+into a real business. Since I now work across three machines, it was hard to keep track of my applications,
+because they were being saved in the browser's memory. So, for those reasons, I added a backend for better
+processing, a database for persisting data, and authentication, and I moved from the BYOK approach to making
+the LLM calls myself.
+
+**Phase 2 - Vite SPA + a separate Hono backend.**
+The project grew into two deployables: a Vite + React SPA and a standalone Hono API on Railway, with BullMQ
+workers on Redis, Postgres (Drizzle) for persistence, Cloudflare R2 for CV PDFs, a custom JWT auth layer,
+IP-based guest users, and a Stripe-backed credit system. This is where ATS scoring, real accounts, and
+saved job history became possible.
+**Lesson:** a proper backend and database unlocked the core features, but two separate deploys, a Redis
+queue, Stripe billing, and guest-user plumbing was a lot of moving infrastructure to babysit for a project
+whose real goal was to be a sharp portfolio piece, not a business.
+
+**Phase 3 - Consolidation into one Next.js app, auth-only.**
+The SPA and the Hono backend were collapsed into a single **Next.js 15 (App Router)** app: one repo, one
+deploy. Auth.js (NextAuth v5) replaced the hand-rolled JWT auth; the BullMQ/Redis workers were dropped in
+favor of in-process, fire-and-forget background tasks with the client polling for status; and Stripe,
+guest users, and the credit system were removed entirely, leaving a clean authenticated-only flow.
+**Lesson:** at this scale, synchronous in-process generation on a single long-running Node host is more than
+enough. Cutting every feature that didn't serve the portfolio goal (payments, guests, a second service)
+made the codebase far easier to reason about and present.
+
+**Phase 4 - Conventions cleanup.**
+Finally, I moved the project onto conventional surfaces: context into `CLAUDE.md` + `.claude/rules/`, and a
+Postgres-only `docker-compose.yml` for one-command local setup.
+
+The through-line: **every phase took infrastructure away.** Extension -> web app, BYOK -> a managed key,
+no-DB -> Postgres, guest -> accounts, two services + a queue -> one app. Each change traded a bit of ambition
+for a lot of clarity, which is exactly the trade a self-contained portfolio project should make.
+
+This is the current, up-to-date user flow:
 
 ```mermaid
 flowchart TD
