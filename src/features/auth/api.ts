@@ -1,8 +1,8 @@
 import { apiClient } from '@/lib/apiClient'
-import type { SignUpResponse, VerifyCodeResponse, ResetPasswordResponse } from './types'
+import type { SignUpResponse, ResetPasswordResponse } from './types'
 
 // Sign in / sign out / session are handled by Auth.js (next-auth/react).
-// These are the custom email-code flows that wrap it.
+// These are the custom routes that wrap it: registration and password reset.
 
 export const signUp = async (email: string, password: string): Promise<SignUpResponse> => {
   const res = await apiClient.post<SignUpResponse>('/auth/register', { email, password })
@@ -11,11 +11,6 @@ export const signUp = async (email: string, password: string): Promise<SignUpRes
 
 export const forgotPassword = async (email: string): Promise<void> => {
   await apiClient.post('/auth/forgot-password', { email })
-}
-
-export const verifyCode = async (email: string, code: string): Promise<VerifyCodeResponse> => {
-  const res = await apiClient.post<VerifyCodeResponse>('/auth/verify-code', { email, code })
-  return res.data
 }
 
 export const resetPassword = async (email: string, code: string, newPassword: string): Promise<ResetPasswordResponse> => {

@@ -10,25 +10,9 @@ export async function findUserByEmail(email: string) {
   return db.query.users.findFirst({ where: eq(users.email, email) })
 }
 
-export async function saveUser(
-  id: string,
-  email: string,
-  passwordHash: string,
-  verificationCode: string,
-  verificationCodeExpiresAt: Date,
-) {
+export async function saveUser(id: string, email: string, passwordHash: string) {
   log.debug({ id, email }, 'saveUser')
-  await db.insert(users).values({ id, email, passwordHash, verificationCode, verificationCodeExpiresAt })
-}
-
-export async function updateUserVerification(id: string) {
-  log.debug({ id }, 'updateUserVerification')
-  await db.update(users).set({ emailVerified: true, verificationCode: null, verificationCodeExpiresAt: null }).where(eq(users.id, id))
-}
-
-export async function updateVerificationCode(id: string, code: string, expiresAt: Date) {
-  log.debug({ id }, 'updateVerificationCode')
-  await db.update(users).set({ verificationCode: code, verificationCodeExpiresAt: expiresAt }).where(eq(users.id, id))
+  await db.insert(users).values({ id, email, passwordHash })
 }
 
 export async function updateResetCode(id: string, code: string, expiresAt: Date) {

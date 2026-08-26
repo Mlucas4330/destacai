@@ -7,11 +7,10 @@ import { CODE_TTL_MS } from '@server/constants'
 import {
   findUserByEmail,
   saveUser,
-  updateUserVerification,
   updateResetCode,
   updatePassword,
 } from '@server/features/auth/repository'
-import { sendVerificationEmail, sendPasswordResetEmail } from '@server/features/auth/email'
+import { sendPasswordResetEmail } from '@server/features/auth/email'
 
 const log = logger.child({ service: 'AuthService' })
 
@@ -21,12 +20,8 @@ export async function createUser(email: string, password: string) {
   if (existing) throw new AppError('Email already in use', 409)
 
   const passwordHash = await hashPassword(password)
-  const code = generateCode()
-  const expiresAt = new Date(Date.now() + CODE_TTL_MS)
-
   const id = randomUUID()
-  await saveUser(id, email, passwordHash, code, expiresAt)
-  await sendVerificationEmail(email, code)
+  await saveUser(id, email, passwordHash)
   log.info({ userId: id }, 'user created')
 }
 
@@ -37,20 +32,7 @@ export async function validateCredentials(email: string, password: string) {
   if (!user || !user.passwordHash) return null
   const valid = await comparePassword(password, user.passwordHash)
   if (!valid) return null
-  if (!user.emailVerified) return null
   return user
-}
-
-export async function verifyCode(email: string, code: string) {
-  log.info({ email }, 'verifyCode')
-  const user = await findUserByEmail(email)
-  if (!user) throw new AppError('User not found', 404)
-  if (user.verificationCode !== code) throw new AppError('Invalid code', 400)
-  if (!user.verificationCodeExpiresAt || user.verificationCodeExpiresAt < new Date()) {
-    throw new AppError('Code expired', 400)
-  }
-  await updateUserVerification(user.id)
-  log.info({ userId: user.id }, 'email verified')
 }
 
 export async function forgotPassword(email: string) {

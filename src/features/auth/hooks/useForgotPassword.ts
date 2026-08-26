@@ -20,7 +20,7 @@ export function useForgotPassword() {
   const mutation = useMutation({
     mutationFn: ({ email }: ForgotPasswordInput) => forgotPassword(email),
     onSuccess: (_, { email }) => {
-      setPendingVerification({ email, purpose: 'password-reset' })
+      setPendingVerification({ email })
       router.push('/verify-code')
     },
     onError(err: Error) {

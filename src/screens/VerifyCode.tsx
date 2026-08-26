@@ -21,12 +21,9 @@ const VerifyCode = () => {
     )
   }
 
-  const { email, purpose } = verif
-  const title = purpose === 'email-verification' ? 'Verify your email' : 'Enter the code'
-  const subtitle =
-    purpose === 'email-verification'
-      ? 'Check your inbox for the 6-digit code we sent to'
-      : 'Enter the 6-digit code we sent to'
+  const { email } = verif
+  const title = 'Enter the code'
+  const subtitle = 'Enter the 6-digit code we sent to'
   return (
     <div className='flex flex-col gap-5 p-5'>
       <button
@@ -40,7 +37,7 @@ const VerifyCode = () => {
         <p className='text-sm text-navy-muted mt-0.5'>{subtitle}</p>
         <p className='text-sm text-navy font-medium mt-0.5'>{email}</p>
       </div>
-      <VerifyCodeForm email={email} purpose={purpose} />
+      <VerifyCodeForm email={email} />
     </div>
   )
 }

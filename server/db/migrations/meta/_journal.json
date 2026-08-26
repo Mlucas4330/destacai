@@ -8,6 +8,13 @@
       "when": 1781886585427,
       "tag": "0000_melted_mockingbird",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1787779470482,
+      "tag": "0001_hard_the_renegades",
+      "breakpoints": true
     }
   ]
 }

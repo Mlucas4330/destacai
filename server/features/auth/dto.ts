@@ -26,12 +26,6 @@ export interface LoginResponse {
   }
 }
 
-export const VerifyCodeSchema = z.object({
-  email: emailSchema,
-  code: codeSchema,
-})
-export type VerifyCodeRequest = z.infer<typeof VerifyCodeSchema>
-
 export const ForgotPasswordSchema = z.object({
   email: emailSchema,
 })

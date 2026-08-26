@@ -9,7 +9,7 @@ export async function POST(req: Request) {
   try {
     const { email, password } = await parseJson(req, RegisterSchema)
     await createUser(email, password)
-    return NextResponse.json({ message: 'Check your email for a 6-digit code.', email }, { status: 201 })
+    return NextResponse.json({ message: 'Account created.', email }, { status: 201 })
   } catch (err) {
     return toErrorResponse(err)
   }
